@@ -60,26 +60,30 @@ input {
         <div id="nameWrapper">
             <h2>ChatIO</h2>
             <p>Créer votre nom d'utilisateur</p>
+            <div id="error"></div>
             <form id="usernameForm">
                 <input type="text" size="35" id="username">
                 <input type="submit" value="Envoyer">
             </form>
         </div>
+
         <div id="mainWrapper">
             <h2>ChatIO</h2>
             <div id="chatWrapper">
                 <div id="chatWindow"></div>
-
                 <form id="messageForm">
                     <input type="text" size="35" id="message" placeholder="Dites quelque chose...">
                     <input type="submit" value="Envoyer">
                 </form>
             </div>
+
+            <div id="userWrapper">
+                <div id="users"></div>
+            </div>
         </div>
 
-        <div id="userWrapper">
-            <div id="usersr"></div>
-        </div>
+        
+    </div>
 
  <script src="https://code.jquery.com/jquery-latest.min.js"></script>
  <script src="/socket.io/socket.io.js"></script>
@@ -90,14 +94,30 @@ input {
        var $message = $('#message');
        var $chat = $('#chatWindow');
        var $usernameForm = $('#usernameForm');
-       var users = $('#users');
+       var $users = $('#users');
        var $username = $('#username');
        var error = $('#error');
 
        $usernameForm.submit(function(e) {
            e.preventDefault();
            console.log('Sumitted');
+           socket.emit('new user', $username.val(), function(data){
+               if(data){
+                    $('#nameWrapper').hide();
+                    $('#mainWrapper').show();
+               } else{
+                $error.html('Ce nom d\'utilisateur est déjà utilisé')
+               }
+           })
        }); 
+
+       socket.on('usernames', function(data){
+           var html = '';
+           for(i = 0; i < data.length; i++) {
+            html += data[i] + '<br>'
+           }
+           $users.html(html);
+       });
 
        $messageForm.submit(function(e) {
            e.preventDefault();
@@ -107,7 +127,7 @@ input {
        });
 
        socket.on('new message', function(data) {
-           $chat.append(data.msg + '<br>');
+           $chat.append('<strong>'+data.user+' </strong>'+': ' +data.msg +'<br>');
        });
 
    });

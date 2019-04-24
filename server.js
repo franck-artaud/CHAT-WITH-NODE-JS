@@ -13,10 +13,14 @@ app.get('/', function(req, res) {
 });
 
 io.sockets.on('connection', function(socket){
-    console.log('socket  is connected');
+    console.log('Socket  is connected');
+
+
+//user connection
+
     socket.on('new user', function (data, callback){
         if(usernames.indexOf(data) != -1) {
-            calback(false);
+            callback(false);
         } else {
             callback(true);
             socket.username = data;
@@ -26,14 +30,14 @@ io.sockets.on('connection', function(socket){
     });
         //Updates usernames
         function updateUsernames() {
-            io.socket.emit('usernames', usernames);
+            io.sockets.emit('usernames', usernames);
         }
 
 
 
     //send message
     socket.on('send message', function(data){
-        io.sockets.emit('new message', {msg : data});
+        io.sockets.emit('new message', {msg : data, user:socket.username});
     });
 
 
@@ -44,7 +48,7 @@ io.sockets.on('connection', function(socket){
             return;
         }
 
-        username.splice(usernames.indexOf(socket.username), 1);
+        usernames.splice(usernames.indexOf(socket.username), 1);
         updateUsernames();
         
     });
