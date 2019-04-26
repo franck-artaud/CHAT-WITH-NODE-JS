@@ -1,4 +1,6 @@
-
+var ent = require('ent');
+var encode = require('ent/encode');
+var decode = require('ent/decode');
 var express = require ('express'),      
     app = express()
     server = require('http').createServer(app),
